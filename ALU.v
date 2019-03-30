@@ -25,8 +25,9 @@
 module ALU (input [3:0] ALUOperation,
             input [31:0] A,
             input [31:0] B,
+				input [4:0] Shamt,
             output reg Zero,
-            output reg [31:0]ALUResult);
+            output reg [31:0] ALUResult);
 
 localparam AND = 4'b0000;
 localparam OR  = 4'b0001;
@@ -45,7 +46,7 @@ begin
         AND:	ALUResult = A & B;
         OR: 	ALUResult = A | B;
         NOR:	ALUResult = ~(A | B);
-        LUI:	ALUResult = {B, 16'b0}
+        LUI:	ALUResult = {B, 16'b0};
         SLL:	ALUResult = A << Shamt;
         SRL:	ALUResult = A >> Shamt;
         default:

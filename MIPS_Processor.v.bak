@@ -15,7 +15,7 @@
  * Version:
  *	1.5
  * Author:
- *	Dr. JosÃ© Luis Pizano Escalante
+ *	Dr. José Luis Pizano Escalante
  * email:
  *	luispizano@iteso.mx
  * Date:
@@ -171,7 +171,6 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 32,
     .ALUOperation(alu_operation_wire),
     .A(read_data_1_wire),
     .B(read_data_2_orr_inmmediate_wire),
-	 .Shamt(instruction_bus_wire[10:6]),
     .Zero(zero_wire),
     .ALUResult(alu_result_wire)
     );
