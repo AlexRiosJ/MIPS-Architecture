@@ -38,22 +38,22 @@ wire [8:0] Selector;
 
 assign Selector = {ALUOp, ALUFunction};
 
-always@(Selector)begin
-    casex(Selector)
-        R_Type_AND:	 ALUControlValues = 4'b0000;
-        R_Type_OR: 	 ALUControlValues = 4'b0001;
-        R_Type_NOR:	 ALUControlValues = 4'b0010;
-        R_Type_ADD:	 ALUControlValues = 4'b0011;
-        R_Type_SUB:	 ALUControlValues = 4'b0100;
-        R_Type_SLL:	 ALUControlValues = 4'b0110;
-        R_Type_SRL:	 ALUControlValues = 4'b0111;
-        I_Type_ADDI:  ALUControlValues = 4'b0011;
-        I_Type_ORI:   ALUControlValues = 4'b0001;
-        I_Type_LUI:	 ALUControlValues = 4'b0101;
-        I_Type_ANDI:  ALUControlValues = 4'b0000;
-        I_Type_BEQ:	 ALUControlValues = 4'b0100;
-        I_Type_LW:	 ALUControlValues = 4'b0011;
-        I_Type_SW:	 ALUControlValues = 4'b0011;
+always@(Selector)begin									  // Operation
+	 casex(Selector)
+        R_Type_AND:	 ALUControlValues = 4'b0000; // AND
+        R_Type_OR: 	 ALUControlValues = 4'b0001; // OR
+        R_Type_NOR:	 ALUControlValues = 4'b0010; // NOR
+        R_Type_ADD:	 ALUControlValues = 4'b0011; // ADD
+        R_Type_SUB:	 ALUControlValues = 4'b0100; // SUB
+        R_Type_SLL:	 ALUControlValues = 4'b0110; // SLL
+        R_Type_SRL:	 ALUControlValues = 4'b0111; // SRL
+        I_Type_ADDI:  ALUControlValues = 4'b0011; // ADD
+        I_Type_ORI:   ALUControlValues = 4'b0001; // OR
+        I_Type_LUI:	 ALUControlValues = 4'b0101; // LUI
+        I_Type_ANDI:  ALUControlValues = 4'b0000; // AND
+        I_Type_BEQ:	 ALUControlValues = 4'b0100; // SUB
+        I_Type_LW:	 ALUControlValues = 4'b0011; // ADD
+        I_Type_SW:	 ALUControlValues = 4'b0011; // ADD
         default:      ALUControlValues = 4'b1001;
     endcase
 end

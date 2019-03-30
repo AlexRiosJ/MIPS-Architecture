@@ -17,8 +17,9 @@
  ******************************************************************/
 module Control (input [5:0]OP,
                 output RegDst,
-                output BranchEQ,
-                output BranchNE,
+                //output BranchEQ,
+                //output BranchNE,
+					 output Branch,
                 output MemRead,
                 output MemtoReg,
                 output MemWrite,
@@ -39,28 +40,28 @@ reg [10:0] ControlValues;
 
 always@(OP) begin
     casex(OP)
-        R_Type:       	ControlValues = 11'b1_001_00_00_111;
-        I_Type_ADDI:  	ControlValues = 11'b0_101_00_00_000;
-        I_Type_ORI:   	ControlValues = 11'b0_101_00_00_001;
-        I_Type_LUI:		ControlValues = 11'b0_101_00_00_010;
-        I_Type_ANDI:		ControlValues = 11'b0_101_00_00_011;
-        I_Type_BEQ:		ControlValues = 11'b0_101_00_00_100;
-        I_Type_LW:		ControlValues = 11'b0_101_00_00_101;
-        I_Type_SW:		ControlValues = 11'b0_101_00_00_110;
+		  /* RegDest_ALUSrc_MemtoReg-RegWrite_MemRead-MemWrite_Branch_ALUOp[] */
+        R_Type:       	ControlValues = 10'b1_0_01_00_0_111;
+        I_Type_ADDI:  	ControlValues = 10'b0_1_01_00_0_000;
+        I_Type_ORI:   	ControlValues = 10'b0_1_01_00_0_001;
+        I_Type_LUI:		ControlValues = 10'b0_1_01_00_0_010;
+        I_Type_ANDI:		ControlValues = 10'b0_1_01_00_0_011;
+        I_Type_BEQ:		ControlValues = 10'bx_0_x0_00_1_100;
+        I_Type_LW:		ControlValues = 10'b0_1_11_00_0_101;
+        I_Type_SW:		ControlValues = 10'bx_1_x0_01_0_110;
         
         default:
         ControlValues = 10'b0000000000;
     endcase
 end
 
-assign RegDst   = ControlValues[10];
-assign ALUSrc   = ControlValues[9];
-assign MemtoReg = ControlValues[8];
-assign RegWrite = ControlValues[7];
-assign MemRead  = ControlValues[6];
-assign MemWrite = ControlValues[5];
-assign BranchNE = ControlValues[4];
-assign BranchEQ = ControlValues[3];
+assign RegDst   = ControlValues[9];
+assign ALUSrc   = ControlValues[8];
+assign MemtoReg = ControlValues[7];
+assign RegWrite = ControlValues[6];
+assign MemRead  = ControlValues[5];
+assign MemWrite = ControlValues[4];
+assign Branch   = ControlValues[3];
 assign ALUOp    = ControlValues[2:0];
 
 endmodule

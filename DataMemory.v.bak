@@ -10,7 +10,7 @@
  *	01/03/2014
  ******************************************************************/
 
-module DataMemory #(parameter DATA_WIDTH = 32,
+module DataMemory #(parameter DATA_WIDTH = 8,
                     parameter MEMORY_DEPTH = 1024)
                    (input [DATA_WIDTH-1:0] WriteData,
                     input [DATA_WIDTH-1:0] Address,

@@ -38,7 +38,7 @@ localparam LUI = 4'b0101;
 localparam SLL = 4'b0110;
 localparam SRL = 4'b0111;
 
-always @ (A or B or ALUOperation)
+always @ (A or B or Shamt or ALUOperation)
 begin
     case (ALUOperation)
         ADD:	ALUResult = A + B;
@@ -46,9 +46,9 @@ begin
         AND:	ALUResult = A & B;
         OR: 	ALUResult = A | B;
         NOR:	ALUResult = ~(A | B);
-        LUI:	ALUResult = {B, 16'b0};
-        SLL:	ALUResult = A << Shamt;
-        SRL:	ALUResult = A >> Shamt;
+        LUI:	ALUResult = {B[15:0], 16'b0};
+        SLL:	ALUResult = B << Shamt;
+        SRL:	ALUResult = B >> Shamt;
         default:
         ALUResult = 0;
     endcase // case(control)
