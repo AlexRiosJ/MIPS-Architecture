@@ -27,7 +27,6 @@ DUV
 	.reset(reset),
 	.ALUResultOut(ALUResultOut),
 	.PortOut(PortOut)
-
 );
 /*********************************************************/
 initial // Clock generator
