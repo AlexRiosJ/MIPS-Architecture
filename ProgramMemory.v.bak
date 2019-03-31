@@ -24,7 +24,7 @@ module ProgramMemory #(parameter MEMORY_DEPTH = 32,
     
     initial
     begin
-        $readmemh("C:/MIPS/MISP_Single_Cycle/Sources/text.dat", rom); // Cambiar
+        $readmemh("../sources/text.dat", rom); // Cambiar
     end
     
     always @ (RealAddress)

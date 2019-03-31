@@ -24,7 +24,7 @@ module ProgramMemory #(parameter MEMORY_DEPTH = 32,
     
     initial
     begin
-        $readmemh("D:/Usuarios/Alejandro Rios/Documents/OneDrive - ITESO/ITESO/6 Semestre/Arquitectura Computacional/Quartus/MIPS-Architecture/sources/text.dat", rom); // Cambiar
+        $readmemh("./sources/text.dat", rom); // Cambiar
     end
     
     always @ (RealAddress)
