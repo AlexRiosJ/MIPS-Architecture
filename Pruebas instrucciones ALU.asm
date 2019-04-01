@@ -10,12 +10,17 @@ srl  $s2,$s0,1
 
 add $zero,$zero,$zero
 
+
+
+addi $s0, $zero, 11
+addi $s1, $zero, 10
+addi $s2, $zero, 1
+label:
+sub $s0, $s0, $s2
+
 and  $s2,$s0,$s1
 or   $s2,$s0,$s1
 nor  $s2,$s0,$s1
 add  $s2,$s0,$s1
 sub  $s2,$zero,$s0
-addi $s0,$zero,0x0000
-sll  $s0,$s0,16
-sw   $s2, ($s0)
-lw   $s1, ($s0)
+beq $s0, $s1, label
