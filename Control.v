@@ -47,7 +47,7 @@ always@(OP) begin
         I_Type_LUI:		ControlValues = 10'b0_1_01_00_0_010;
         I_Type_ANDI:		ControlValues = 10'b0_1_01_00_0_011;
         I_Type_BEQ:		ControlValues = 10'bx_0_x0_00_1_100;
-        I_Type_LW:		ControlValues = 10'b0_1_11_00_0_101;
+        I_Type_LW:		ControlValues = 10'b0_1_11_10_0_101;
         I_Type_SW:		ControlValues = 10'bx_1_x0_01_0_110;
         
         default:

@@ -27,9 +27,9 @@ module DataMemory #(parameter DATA_WIDTH = 32,
     begin
         // Write
         if (MemWrite)
-            ram[Address] <= WriteData;
+            ram[Address & 32'h0000_03ff] <= WriteData;
 	end
-	assign ReadDataAux = ram[Address];
-	assign ReadData    = {DATA_WIDTH{MemRead}}& ReadDataAux;
+	assign ReadDataAux = ram[Address & 32'h0000_03ff];
+	assign ReadData    = {DATA_WIDTH{MemRead}} & ReadDataAux;
 
 endmodule
