@@ -1,16 +1,16 @@
 /******************************************************************
  * Description
- *	This is  module represents the register file where the registers
- *	like $s0-$s7 are store.
- *	of MIPS processor.
+ *  This is  module represents the register file where the registers
+ *  like $s0-$s7 are store.
+ *  of MIPS processor.
  * Version:
- *	1.0
+ *  1.0
  * Author:
- *	Dr. José Luis Pizano Escalante
+ *  Dr. José Luis Pizano Escalante
  * email:
- *	luispizano@iteso.mx
+ *  luispizano@iteso.mx
  * Date:
- *	01/03/2014
+ *  01/03/2014
  ******************************************************************/
 module RegisterFile #(parameter N = 32)
                      (input clk,
@@ -50,8 +50,6 @@ module RegisterFile #(parameter N = 32)
     .DataInput(0),
     .DataOutput(Intercnection_wire[N-1:0])
     );
-    
-    
     
     
     
@@ -344,6 +342,8 @@ module RegisterFile #(parameter N = 32)
     .DataOutput(Intercnection_wire[25*N-1:24*N])
     );
     
+    
+    
     Register
     Register_t9
     (
@@ -391,6 +391,7 @@ module RegisterFile #(parameter N = 32)
     );
     
     
+
     Register
     Register_sp
     (
@@ -400,7 +401,6 @@ module RegisterFile #(parameter N = 32)
     .DataInput(WriteData),
     .DataOutput(Intercnection_wire[30*N-1:29*N])
     );
-    
     
     
     
@@ -425,7 +425,6 @@ module RegisterFile #(parameter N = 32)
     .DataInput(WriteData),
     .DataOutput(Intercnection_wire[32*N-1:31*N])
     );
-    
     
     
     

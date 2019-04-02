@@ -1,13 +1,13 @@
 /******************************************************************
  * Description
- *	This is the data memory for the MIPS processor
- *	1.0
+ *  This is the data memory for the MIPS processor
+ *  1.0
  * Author:
- *	Dr. José Luis Pizano Escalante
+ *  Dr. José Luis Pizano Escalante
  * email:
- *	luispizano@iteso.mx
+ *  luispizano@iteso.mx
  * Date:
- *	01/03/2014
+ *  01/03/2014
  ******************************************************************/
 
 module DataMemory #(parameter DATA_WIDTH = 32,
@@ -28,8 +28,8 @@ module DataMemory #(parameter DATA_WIDTH = 32,
         // Write
         if (MemWrite)
             ram[Address & 32'h0000_03ff] <= WriteData;
-	end
-	assign ReadDataAux = ram[Address & 32'h0000_03ff];
-	assign ReadData    = {DATA_WIDTH{MemRead}} & ReadDataAux;
-
+    end
+    assign ReadDataAux = ram[Address & 32'h0000_03ff];
+    assign ReadData    = {DATA_WIDTH{MemRead}} & ReadDataAux;
+        
 endmodule

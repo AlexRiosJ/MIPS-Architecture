@@ -1,14 +1,14 @@
 /******************************************************************
  * Description
- *		This is an AND gate:
+ *      This is an AND gate:
  * Version:
- *	1.0
+ *  1.0
  * Author:
- *	Dr. José Luis Pizano Escalante
+ *  Dr. José Luis Pizano Escalante
  * email:
- *	luispizano@iteso.mx
+ *  luispizano@iteso.mx
  * Date:
- *	01/03/2014
+ *  01/03/2014
  ******************************************************************/
 module ANDGate (input A,
                 input B,

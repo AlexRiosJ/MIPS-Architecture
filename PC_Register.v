@@ -1,15 +1,15 @@
 /******************************************************************
  * Description
- *	This is a register of 32-bit that corresponds to the PC counter.
- *	This register does not have an enable signal.
+ *  This is a register of 32-bit that corresponds to the PC counter.
+ *  This register does not have an enable signal.
  * Version:
- *	1.0
+ *  1.0
  * Author:
- *	Dr. José Luis Pizano Escalante
+ *  Dr. José Luis Pizano Escalante
  * email:
- *	luispizano@iteso.mx
+ *  luispizano@iteso.mx
  * Date:
- *	01/03/2014
+ *  01/03/2014
  ******************************************************************/
 
 module PC_Register #(parameter N = 32)

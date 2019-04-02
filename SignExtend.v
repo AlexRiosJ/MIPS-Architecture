@@ -1,15 +1,15 @@
 /******************************************************************
  * Description
- *	This module performes a sign-extend operation that is need with
- *	in instruction like andi or ben.
+ *  This module performes a sign-extend operation that is need with
+ *  in instruction like andi or ben.
  * Version:
- *	1.0
+ *  1.0
  * Author:
- *	Dr. José Luis Pizano Escalante
+ *  Dr. José Luis Pizano Escalante
  * email:
- *	luispizano@iteso.mx
+ *  luispizano@iteso.mx
  * Date:
- *	01/03/2014
+ *  01/03/2014
  ******************************************************************/
 module SignExtend (input [15:0] DataInput,
                    output[31:0] SignExtendOutput);

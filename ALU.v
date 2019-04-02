@@ -1,31 +1,31 @@
 /******************************************************************
  * Description
- *	This is an 32-bit arithetic logic unit that can execute the next set of operations:
- *		add
- *		sub
- *		or
- *		and
- *		nor
- *		lui
- *		sll
- *		srl
+ *  This is an 32-bit arithetic logic unit that can execute the next set of operations:
+ *      add
+ *      sub
+ *      or
+ *      and
+ *      nor
+ *      lui
+ *      sll
+ *      srl
  * This ALU is written by using behavioral description.
  * Version:
- *	1.0
+ *  1.0
  * Author:
- *	Alejandro Rios Jasso
- *	Javier Ochoa Pardo
+ *  Alejandro Rios Jasso
+ *  Javier Ochoa Pardo
  * email:
- *	is708932@iteso.mx
- *	is702811@iteso.mx
+ *  is708932@iteso.mx
+ *  is702811@iteso.mx
  * Date:
- *	29/03/2019
+ *  29/03/2019
  ******************************************************************/
 
 module ALU (input [3:0] ALUOperation,
             input [31:0] A,
             input [31:0] B,
-				input [4:0] Shamt,
+            input [4:0] Shamt,
             output reg Zero,
             output reg [31:0] ALUResult);
 
@@ -41,14 +41,14 @@ localparam SRL = 4'b0111;
 always @ (A or B or Shamt or ALUOperation)
 begin
     case (ALUOperation)
-        ADD:	ALUResult = A + B;
-        SUB:	ALUResult = A - B;
-        AND:	ALUResult = A & B;
-        OR: 	ALUResult = A | B;
-        NOR:	ALUResult = ~(A | B);
-        LUI:	ALUResult = {B[15:0], 16'b0};
-        SLL:	ALUResult = B << Shamt;
-        SRL:	ALUResult = B >> Shamt;
+        ADD:    ALUResult = A + B;
+        SUB:    ALUResult = A - B;
+        AND:    ALUResult = A & B;
+        OR:     ALUResult = A | B;
+        NOR:    ALUResult = ~(A | B);
+        LUI:    ALUResult = {B[15:0], 16'b0};
+        SLL:    ALUResult = B << Shamt;
+        SRL:    ALUResult = B >> Shamt;
         default:
         ALUResult = 0;
     endcase // case(control)

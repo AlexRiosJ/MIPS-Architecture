@@ -22,10 +22,10 @@ wire [31:0] PortOut;
 MIPS_Processor
 DUV
 (
-	.clk(clk),
-	.reset(reset),
-	.ALUResultOut(ALUResultOut),
-	.PortOut(PortOut)
+    .clk(clk),
+    .reset(reset),
+    .ALUResultOut(ALUResultOut),
+    .PortOut(PortOut)
 );
 /*********************************************************/
 initial // Clock generator
@@ -34,11 +34,11 @@ initial // Clock generator
   end
 /*********************************************************/
 initial begin // reset generator
-	#5 reset = 1;
+    #5 reset = 1;
 end
 /*********************************************************/
 initial begin // reset generator
-	#4 PortIn = 3;
+    #4 PortIn = 3;
 end
 
 /*********************************************************/
