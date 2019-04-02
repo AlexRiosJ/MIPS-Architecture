@@ -41,6 +41,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 64,
     //******************************************************************/
     //******************************************************************/
     // signals to connect modules
+	 wire jump_wire;
     wire branch_ne_wire; //
     wire branch_eq_wire; //
     wire reg_dst_wire; // 
@@ -70,8 +71,10 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 64,
 	 wire [31:0] branch_adder_output_wire;
     wire [31:0] pc_plus_4_wire; //
     wire [31:0] pc_to_branch_wire; //
-	 wire [31:0] next_pc_wire;
+	 wire [31:0] next_pc_wire_1;
+	 wire [31:0] next_pc_wire_2;
 	 wire [31:0] shift_left_2_1_wire;
+	 wire [27:0] jump_address_wire;
     
     //******************************************************************/
     //******************************************************************/
@@ -84,7 +87,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 64,
     .Selector(pc_src_wire),
     .MUX_Data0(pc_plus_4_wire),
     .MUX_Data1(branch_adder_output_wire),
-    .MUX_Output(next_pc_wire)
+    .MUX_Output(next_pc_wire_1)
     );
 	 
 	 Adder32bits
@@ -96,10 +99,17 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 64,
     );
 	 
 	 ShiftLeft2
-	 Shif_Left_2_1
+	 Shift_Left_2_1
 	 (
 	 .DataInput(immediate_extend_wire),
 	 .DataOutput(shift_left_2_1_wire)
+	 );
+	 
+	 ShiftLeft2
+	 Shift_Left_2_2
+	 (
+	 .DataInput(instruction_bus_wire[25:0]),
+	 .DataOutput(jump_address_wire)
 	 );
 	 
 	 Adder32bits
@@ -110,12 +120,21 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 64,
 	 .Result(branch_adder_output_wire)
 	 );
 	 
+	 Multiplexer2to1
+	 PC_Src_MUX_2
+    (
+    .Selector(jump_wire),
+    .MUX_Data0(next_pc_wire_1),
+    .MUX_Data1({pc_plus_4_wire[31:28], jump_address_wire}),
+    .MUX_Output(next_pc_wire_2)
+    );
+	 
     PC_Register
     ProgramCounter
     (
     .clk(clk),
     .reset(reset),
-    .NewPC(next_pc_wire),
+    .NewPC(next_pc_wire_2),
     .PCValue(pc_wire)
     );
     
@@ -134,6 +153,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 64,
     (
     .OP(instruction_bus_wire[31:26]),
     .RegDst(reg_dst_wire),
+	 .Jump(jump_wire),
     .BranchEQ(branch_eq_wire),
     .BranchNE(branch_ne_wire),
 	 .MemRead(mem_read_wire),
