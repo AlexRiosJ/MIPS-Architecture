@@ -27,7 +27,7 @@
  ******************************************************************/
 
 
-module MIPS_Processor #(parameter MEMORY_DEPTH = 64,
+module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
                         parameter PC_INCREMENT = 4)
                        (input clk,
                         input reset,
@@ -42,9 +42,10 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 64,
     //******************************************************************/
     // signals to connect modules
 	 wire jump_wire;
+	 wire jr_wire;
     wire branch_ne_wire; //
     wire branch_eq_wire; //
-    wire reg_dst_wire; // 
+    wire [1:0] reg_dst_wire; // 
     wire not_zero_and_brach_ne_wire; //
     wire zero_and_brach_eq_wire; //
     wire or_for_branch; //
@@ -54,7 +55,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 64,
 	 wire pc_src_wire;
 	 wire mem_read_wire;
 	 wire mem_write_wire;
-	 wire mem_to_reg_wire;
+	 wire [1:0] mem_to_reg_wire;
 	 wire [31:0] write_data_wire;
 	 wire [31:0] read_data_wire;
     wire [3:0] aluop_wire; //
@@ -73,6 +74,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 64,
     wire [31:0] pc_to_branch_wire; //
 	 wire [31:0] next_pc_wire_1;
 	 wire [31:0] next_pc_wire_2;
+	 wire [31:0] next_pc_wire_3;
 	 wire [31:0] shift_left_2_1_wire;
 	 wire [27:0] jump_address_wire;
     
@@ -129,12 +131,21 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 64,
     .MUX_Output(next_pc_wire_2)
     );
 	 
+	 Multiplexer2to1
+	 PC_Src_MUX_3
+	 (
+	 .Selector(jr_wire),
+    .MUX_Data0(next_pc_wire_2),
+    .MUX_Data1(read_data_1_wire),
+    .MUX_Output(next_pc_wire_3)
+	 );
+	 
     PC_Register
     ProgramCounter
     (
     .clk(clk),
     .reset(reset),
-    .NewPC(next_pc_wire_2),
+    .NewPC(next_pc_wire_3),
     .PCValue(pc_wire)
     );
     
@@ -177,7 +188,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 64,
     //******************************************************************/
     //******************************************************************/
     //******************************************************************/
-    Multiplexer2to1
+    Multiplexer3to1
     #(
     .NBits(5)
     )
@@ -186,6 +197,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 64,
     .Selector(reg_dst_wire),
     .MUX_Data0(instruction_bus_wire[20:16]),
     .MUX_Data1(instruction_bus_wire[15:11]),
+	 .MUX_Data2(5'b11111),
     .MUX_Output(write_register_wire)
     );
     
@@ -220,7 +232,8 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 64,
     (
     .ALUOp(aluop_wire),
     .ALUFunction(instruction_bus_wire[5:0]), // Shamt
-    .ALUOperation(alu_operation_wire)
+    .ALUOperation(alu_operation_wire),
+	 .JR(jr_wire)
     );
     
     ALU
@@ -269,12 +282,13 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 64,
 	 .ReadData(read_data_wire)
 	 );
 	 
-	 Multiplexer2to1
+	 Multiplexer3to1
 	 Result_MUX
 	 (
     .Selector(mem_to_reg_wire),
     .MUX_Data0(alu_result_wire),
     .MUX_Data1(read_data_wire),
+	 .MUX_Data2(pc_plus_4_wire),
     .MUX_Output(write_data_wire)
     );
     
