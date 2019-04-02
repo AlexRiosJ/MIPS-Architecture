@@ -14,27 +14,28 @@
  * Date:
  *	29/03/2019
  ******************************************************************/
-module ALUControl (input [2:0] ALUOp,
+module ALUControl (input [3:0] ALUOp,
                    input [5:0] ALUFunction,
                    output [3:0] ALUOperation);
 
-localparam R_Type_AND  = 9'b111_100100;
-localparam R_Type_OR   = 9'b111_100101;
-localparam R_Type_NOR  = 9'b111_100111;
-localparam R_Type_ADD  = 9'b111_100000;
-localparam R_Type_SUB  = 9'b111_100010;
-localparam R_Type_SLL  = 9'b111_000000;
-localparam R_Type_SRL  = 9'b111_000010;
-localparam I_Type_ADDI = 9'b000_xxxxxx;
-localparam I_Type_ORI  = 9'b001_xxxxxx;
-localparam I_Type_LUI  = 9'b010_xxxxxx;
-localparam I_Type_ANDI = 9'b011_xxxxxx;
-localparam I_Type_BEQ  = 9'b100_xxxxxx;
-localparam I_Type_LW   = 9'b101_xxxxxx;
-localparam I_Type_SW   = 9'b110_xxxxxx;
+localparam R_Type_AND  = 10'b0000_100100;
+localparam R_Type_OR   = 10'b0000_100101;
+localparam R_Type_NOR  = 10'b0000_100111;
+localparam R_Type_ADD  = 10'b0000_100000;
+localparam R_Type_SUB  = 10'b0000_100010;
+localparam R_Type_SLL  = 10'b0000_000000;
+localparam R_Type_SRL  = 10'b0000_000010;
+localparam I_Type_ADDI = 10'b0001_xxxxxx;
+localparam I_Type_ORI  = 10'b0010_xxxxxx;
+localparam I_Type_LUI  = 10'b0011_xxxxxx;
+localparam I_Type_ANDI = 10'b0100_xxxxxx;
+localparam I_Type_BEQ  = 10'b0101_xxxxxx;
+localparam I_Type_BNE  = 10'b0110_xxxxxx;
+localparam I_Type_LW   = 10'b0111_xxxxxx;
+localparam I_Type_SW   = 10'b1000_xxxxxx;
 
 reg [3:0] ALUControlValues;
-wire [8:0] Selector;
+wire [9:0] Selector;
 
 assign Selector = {ALUOp, ALUFunction};
 
@@ -52,6 +53,7 @@ always@(Selector)begin									  // Operation
         I_Type_LUI:	 ALUControlValues = 4'b0101; // LUI
         I_Type_ANDI:  ALUControlValues = 4'b0000; // AND
         I_Type_BEQ:	 ALUControlValues = 4'b0100; // SUB
+		  I_Type_BNE:	 ALUControlValues = 4'b0100; // SUB
         I_Type_LW:	 ALUControlValues = 4'b0011; // ADD
         I_Type_SW:	 ALUControlValues = 4'b0011; // ADD
         default:      ALUControlValues = 4'b1001;

@@ -38,4 +38,8 @@ addi $t0, $t0, -1
 end_for:
 lw $s1, ($s1)
 
-
+add $s0, $zero, $zero
+addi $s1, $zero, 4
+bne_loop:
+addi $s0, $s0, 1
+bne $s0, $s1, bne_loop

@@ -8,6 +8,10 @@
  *		or
  *		and
  *		nor
+ *		lw
+ *		sw
+ *		beq
+ *		bne
  * This processor is written Verilog-HDL. Also, it is synthesizable into hardware.
  * Parameter MEMORY_DEPTH configures the program memory to allocate the program to
  * be execute. If the size of the program changes, thus, MEMORY_DEPTH must change.
@@ -23,7 +27,7 @@
  ******************************************************************/
 
 
-module MIPS_Processor #(parameter MEMORY_DEPTH = 32,
+module MIPS_Processor #(parameter MEMORY_DEPTH = 64,
                         parameter PC_INCREMENT = 4)
                        (input clk,
                         input reset,
@@ -37,12 +41,11 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 32,
     //******************************************************************/
     //******************************************************************/
     // signals to connect modules
-    // wire branch_ne_wire; //
-    // wire branch_eq_wire; //
-	 wire branch_wire;
+    wire branch_ne_wire; //
+    wire branch_eq_wire; //
     wire reg_dst_wire; // 
-    wire not_zero_and_brach_ne; //
-    wire zero_and_brach_eq; //
+    wire not_zero_and_brach_ne_wire; //
+    wire zero_and_brach_eq_wire; //
     wire or_for_branch; //
     wire alu_src_wire; //
     wire reg_write_wire; //
@@ -53,7 +56,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 32,
 	 wire mem_to_reg_wire;
 	 wire [31:0] write_data_wire;
 	 wire [31:0] read_data_wire;
-    wire [2:0] aluop_wire; //
+    wire [3:0] aluop_wire; //
     wire [3:0] alu_operation_wire; //
     wire [4:0] write_register_wire; //
     wire [31:0] mux_pc_wire; //
@@ -64,7 +67,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 32,
     wire [31:0] immediate_extend_wire; //
     wire [31:0] read_data_2_or_immediate_wire; //
     wire [31:0] alu_result_wire; //
-	 wire [31:0] alu_result_2_wire;
+	 wire [31:0] branch_adder_output_wire;
     wire [31:0] pc_plus_4_wire; //
     wire [31:0] pc_to_branch_wire; //
 	 wire [31:0] next_pc_wire;
@@ -76,16 +79,16 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 32,
     //******************************************************************/
     //******************************************************************/
 	 Multiplexer2to1
-    MUX_ForPC_Or_Branch
+    PC_Src_MUX
     (
     .Selector(pc_src_wire),
     .MUX_Data0(pc_plus_4_wire),
-    .MUX_Data1(alu_result_2_wire),
+    .MUX_Data1(branch_adder_output_wire),
     .MUX_Output(next_pc_wire)
     );
 	 
 	 Adder32bits
-    PC_Plus_4
+    PC_Adder
     (
     .Data0(pc_wire),
     .Data1(PC_INCREMENT),
@@ -100,11 +103,11 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 32,
 	 );
 	 
 	 Adder32bits
-	 PC_plus_4_plus_instruction
+	 Branch_Adder
 	 (
 	 .Data0(pc_plus_4_wire),
 	 .Data1(shift_left_2_1_wire),
-	 .Result(alu_result_2_wire)
+	 .Result(branch_adder_output_wire)
 	 );
 	 
     PC_Register
@@ -131,9 +134,8 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 32,
     (
     .OP(instruction_bus_wire[31:26]),
     .RegDst(reg_dst_wire),
-    //.BranchNE(branch_ne_wire),
-    //.BranchEQ(branch_eq_wire),
-	 .Branch(branch_wire),
+    .BranchEQ(branch_eq_wire),
+    .BranchNE(branch_ne_wire),
 	 .MemRead(mem_read_wire),
 	 .MemtoReg(mem_to_reg_wire),
 	 .MemWrite(mem_write_wire),
@@ -159,7 +161,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 32,
     #(
     .NBits(5)
     )
-    MUX_ForRTypeAndIType
+	 Reg_Dst_MUX
     (
     .Selector(reg_dst_wire),
     .MUX_Data0(instruction_bus_wire[20:16]),
@@ -185,7 +187,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 32,
     #(
     .NBits(32)
     )
-    MUX_ForReadDataAndInmediate
+    ALU_Src_MUX
     (
     .Selector(alu_src_wire),
     .MUX_Data0(read_data_2_wire),
@@ -213,10 +215,26 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 32,
     );
 	 
 	 ANDGate
-	 AND_Gate_For_Branches
+	 BranchEQ_AND_Gate
 	 (
-	 .A(branch_wire),
+	 .A(branch_eq_wire),
 	 .B(zero_wire),
+	 .C(zero_and_brach_eq_wire)
+	 );
+	 
+	 ANDGate
+	 BranchNE_AND_Gate
+	 (
+	 .A(branch_ne_wire),
+	 .B(~zero_wire),
+	 .C(not_zero_and_brach_ne_wire)
+	 );
+	 
+	 ORGate
+	 Branch_OR_Gate
+	 (
+	 .A(zero_and_brach_eq_wire),
+	 .B(not_zero_and_brach_ne_wire),
 	 .C(pc_src_wire)
 	 );
 	 
@@ -232,7 +250,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 32,
 	 );
 	 
 	 Multiplexer2to1
-	 Data_Memory_MUX
+	 Result_MUX
 	 (
     .Selector(mem_to_reg_wire),
     .MUX_Data0(alu_result_wire),
