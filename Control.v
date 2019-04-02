@@ -36,7 +36,7 @@ localparam I_Type_BEQ  = 6'h4;
 localparam I_Type_BNE  = 6'h5;
 localparam I_Type_LW   = 6'h23;
 localparam I_Type_SW   = 6'h2b;
-localparam J_Type_J	   = 6'h2;
+localparam J_Type_J    = 6'h2;
 localparam J_Type_JAL  = 6'h3;
 
 reg [14:0] ControlValues;
