@@ -52,7 +52,7 @@ always@(OP) begin
 		  I_Type_BNE:		ControlValues = 13'bx_0_0_x_0_0_0_0_1_0110;
         I_Type_LW:		ControlValues = 13'b0_0_1_1_1_1_0_0_0_0111;
         I_Type_SW:		ControlValues = 13'bx_0_1_x_0_0_1_0_0_1000;
-		  J_Type_J:			ControlValues = 13'bx_1_x_x_x_x_x_x_x_xxxx;
+		  J_Type_J:			ControlValues = 13'bx_1_x_x_x_0_x_x_x_xxxx;
         
         default:
         ControlValues = 10'b0000000000;

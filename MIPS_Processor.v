@@ -125,7 +125,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 64,
     (
     .Selector(jump_wire),
     .MUX_Data0(next_pc_wire_1),
-    .MUX_Data1({pc_plus_4_wire[31:28], jump_address_wire}),
+    .MUX_Data1({pc_plus_4_wire[31:28], jump_address_wire & 28'h000_03ff}), // Mascara de 10 bit para memoria ROM
     .MUX_Output(next_pc_wire_2)
     );
 	 
