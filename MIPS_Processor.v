@@ -48,7 +48,6 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     wire [1:0] reg_dst_wire; //
     wire not_zero_and_branch_ne_wire; //
     wire zero_and_branch_eq_wire; //
-    wire or_for_branch; //
     wire alu_src_wire; //
     wire reg_write_wire; //
     wire zero_wire; //
@@ -61,7 +60,6 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     wire [3:0] aluop_wire; //
     wire [3:0] alu_operation_wire; //
     wire [4:0] write_register_wire; //
-    wire [31:0] mux_pc_wire; //
     wire [31:0] pc_wire; //
     wire [31:0] instruction_bus_wire; //
     wire [31:0] read_data_1_wire; //
@@ -71,7 +69,6 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     wire [31:0] alu_result_wire; //
     wire [31:0] branch_adder_output_wire;
     wire [31:0] pc_plus_4_wire; //
-    wire [31:0] pc_to_branch_wire; //
     wire [31:0] next_pc_wire_1;
     wire [31:0] next_pc_wire_2;
     wire [31:0] next_pc_wire_3;
