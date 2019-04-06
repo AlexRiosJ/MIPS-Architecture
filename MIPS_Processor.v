@@ -4,14 +4,18 @@
  *      add
  *      addi
  *      sub
- *      ori
  *      or
+ *      ori
  *      and
+ *      andi
  *      nor
  *      lw
  *      sw
  *      beq
  *      bne
+ *      j
+ *      jal
+ *      jr
  * This processor is written Verilog-HDL. Also, it is synthesizable into hardware.
  * Parameter MEMORY_DEPTH configures the program memory to allocate the program to
  * be execute. If the size of the program changes, thus, MEMORY_DEPTH must change.
@@ -19,11 +23,13 @@
  * Version:
  *  1.5
  * Author:
- *  Dr. JosÃ© Luis Pizano Escalante
+ *  Alejandro Rios Jasso
+ *  Javier Ochoa Pardo
  * email:
- *  luispizano@iteso.mx
+ *  is708932@iteso.mx
+ *  is702811@iteso.mx
  * Date:
- *  2/09/2018
+ *  05/04/2019
  ******************************************************************/
 
 

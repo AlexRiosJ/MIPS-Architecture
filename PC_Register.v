@@ -5,11 +5,13 @@
  * Version:
  *  1.0
  * Author:
- *  Dr. José Luis Pizano Escalante
+ *  Alejandro Rios Jasso
+ *  Javier Ochoa Pardo
  * email:
- *  luispizano@iteso.mx
+ *  is708932@iteso.mx
+ *  is702811@iteso.mx
  * Date:
- *  01/03/2014
+ *  05/04/2019
  ******************************************************************/
 
 module PC_Register #(parameter N = 32)

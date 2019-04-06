@@ -12,7 +12,7 @@
  *  is708932@iteso.mx
  *  is702811@iteso.mx
  * Date:
- *  29/03/2019
+ *  05/04/2019
  ******************************************************************/
 module ALUControl (input [3:0] ALUOp,
                    input [5:0] ALUFunction,
