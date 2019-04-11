@@ -44,8 +44,8 @@ reg [15:0] ControlValues;
 
 always@(OP or Func) begin
     casex(OP)
-        /* RegDest[1:0]_Jump_ALUSrc_MemtoReg[1:0]_RegWrite_MemRead_MemWrite_BranchEQ_BranchNE_ALUOp[3:0] */
-        R_Type:         ControlValues = (Func == 6'h8) ? 16'b01_10_0_00_1_0_0_0_0_0000 : 16'b01_00_0_00_1_0_0_0_0_0000; // JR o solo R
+        /* RegDest[1:0]_Jump[1:0]_ALUSrc_MemtoReg[1:0]_RegWrite_MemRead_MemWrite_BranchEQ_BranchNE_ALUOp[3:0] */
+        R_Type:         ControlValues = (Func == 6'h8) ? 16'b01_10_0_00_1_0_0_0_0_0000 : 16'b01_00_0_00_1_0_0_0_0_0000; // JR or just R_Type
         I_Type_ADDI:    ControlValues = 16'b00_00_1_00_1_0_0_0_0_0001;
         I_Type_ORI:     ControlValues = 16'b00_00_1_00_1_0_0_0_0_0010;
         I_Type_LUI:     ControlValues = 16'b00_00_1_00_1_0_0_0_0_0011;
@@ -61,9 +61,6 @@ always@(OP or Func) begin
         ControlValues = 10'b0000000000;
     endcase
 end
-
-// JR Instruction 
-// assign ControlValues = (OP == 0 && Func == 6'h08) ? 16'b01_10_0_00_1_0_0_0_0_0000 : ControlValues;
 
 assign RegDst   = ControlValues[15:14];
 assign Jump     = ControlValues[13:12];
