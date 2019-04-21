@@ -66,7 +66,6 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256)
     wire [4:0] write_register_wire; //
     wire [31:0] pc_wire; //
     wire [31:0] instruction_bus_wire_IF; //
-    wire [31:0] instruction_bus_wire_ID; //
     wire [31:0] read_data_1_wire; //
     wire [31:0] read_data_2_wire; //
     wire [31:0] immediate_extend_wire; //
@@ -74,7 +73,6 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256)
     wire [31:0] alu_result_wire; //
     wire [31:0] branch_adder_output_wire;
     wire [31:0] pc_plus_4_wire_IF; //
-    wire [31:0] pc_plus_4_wire_ID; //
     wire [31:0] next_pc_wire_1;
     wire [31:0] next_pc_wire_2;
     wire [31:0] shift_left_2_1_wire;
@@ -95,21 +93,6 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256)
     // Outputs
     .instruction_bus(instruction_bus_wire_IF),
     .pc_plus_4_IF(pc_plus_4_wire_IF)
-    )
-
-    // **** Pipeline Registers ****
-    IF_ID_Register 
-    IF_ID_Register
-    (
-    // Inputs
-    .clk(clk),
-    .reset(reset),
-    .instruction_in(instruction_bus_wire_IF),
-    .pc_in(pc_plus_4_wire_IF),
-
-    // Outputs
-    .instruction_out(instruction_bus_wire_ID),
-    .pc_out(pc_plus_4_wire_ID)
     )
 
     // Multiplexer2to1
