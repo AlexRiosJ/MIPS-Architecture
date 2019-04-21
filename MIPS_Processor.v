@@ -47,8 +47,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     //******************************************************************/
     //******************************************************************/
     // signals to connect modules
-    wire jump_wire;
-    wire jr_wire;
+    wire [1:0] jump_wire;
     wire branch_ne_wire; //
     wire branch_eq_wire; //
     wire [1:0] reg_dst_wire; //
@@ -77,7 +76,6 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     wire [31:0] pc_plus_4_wire; //
     wire [31:0] next_pc_wire_1;
     wire [31:0] next_pc_wire_2;
-    wire [31:0] next_pc_wire_3;
     wire [31:0] shift_left_2_1_wire;
     wire [27:0] jump_address_wire;
     
@@ -125,22 +123,14 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     .Result(branch_adder_output_wire)
     );
     
-    Multiplexer2to1
+    Multiplexer3to1
     PC_Src_MUX_2
     (
     .Selector(jump_wire),
     .MUX_Data0(next_pc_wire_1),
-    .MUX_Data1({pc_plus_4_wire[31:28], jump_address_wire & 28'h000_03ff}), // Mascara de 10 bit para memoria ROM
+    .MUX_Data1({pc_plus_4_wire[31:28], jump_address_wire & 28'h000_03ff}), // 10 bit mask for ROM
+    .MUX_Data2(read_data_1_wire),
     .MUX_Output(next_pc_wire_2)
-    );
-    
-    Multiplexer2to1
-    PC_Src_MUX_3
-    (
-    .Selector(jr_wire),
-    .MUX_Data0(next_pc_wire_2),
-    .MUX_Data1(read_data_1_wire),
-    .MUX_Output(next_pc_wire_3)
     );
     
     PC_Register
@@ -148,7 +138,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     (
     .clk(clk),
     .reset(reset),
-    .NewPC(next_pc_wire_3),
+    .NewPC(next_pc_wire_2),
     .PCValue(pc_wire)
     );
     
@@ -166,6 +156,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     ControlUnit
     (
     .OP(instruction_bus_wire[31:26]),
+    .Func(instruction_bus_wire[5:0]),
     .RegDst(reg_dst_wire),
     .Jump(jump_wire),
     .BranchEQ(branch_eq_wire),
@@ -235,8 +226,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     (
     .ALUOp(aluop_wire),
     .ALUFunction(instruction_bus_wire[5:0]), // Shamt
-    .ALUOperation(alu_operation_wire),
-    .JR(jr_wire)
+    .ALUOperation(alu_operation_wire)
     );
     
     ALU
