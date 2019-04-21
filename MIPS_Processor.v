@@ -33,8 +33,7 @@
  ******************************************************************/
 
 
-module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
-                        parameter PC_INCREMENT = 4)
+module MIPS_Processor #(parameter MEMORY_DEPTH = 256)
                        (input clk,
                         input reset,
                         input [7:0] PortIn,
@@ -66,40 +65,52 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     wire [3:0] alu_operation_wire; //
     wire [4:0] write_register_wire; //
     wire [31:0] pc_wire; //
-    wire [31:0] instruction_bus_wire; //
+    wire [31:0] instruction_bus_wire_IF; //
     wire [31:0] read_data_1_wire; //
     wire [31:0] read_data_2_wire; //
     wire [31:0] immediate_extend_wire; //
     wire [31:0] read_data_2_or_immediate_wire; //
     wire [31:0] alu_result_wire; //
     wire [31:0] branch_adder_output_wire;
-    wire [31:0] pc_plus_4_wire; //
+    wire [31:0] pc_plus_4_wire_IF; //
     wire [31:0] next_pc_wire_1;
     wire [31:0] next_pc_wire_2;
     wire [31:0] shift_left_2_1_wire;
     wire [27:0] jump_address_wire;
     
-    //******************************************************************/
-    //******************************************************************/
-    //******************************************************************/
-    //******************************************************************/
-    //******************************************************************/
-    Multiplexer2to1
-    PC_Src_MUX
+    // **** Pipeline Stages ****
+    IF_Stage
+    IF_Stage
     (
-    .Selector(pc_src_wire),
-    .MUX_Data0(pc_plus_4_wire),
-    .MUX_Data1(branch_adder_output_wire),
-    .MUX_Output(next_pc_wire_1)
-    );
+    #(
+    .MEMORY_DEPTH(MEMORY_DEPTH)
+    )
+    // Inputs
+    .clk(clk),
+    .reset(reset),
+    .pc_src_M(pc_src_wire_M),
+    .pc_branch_M(pc_branch_wire_M),
+    // Outputs
+    .instruction_bus(instruction_bus_wire_IF),
+    .pc_plus_4_IF(pc_plus_4_wire_IF)
+    )
+
+    // Multiplexer2to1
+    // PC_Src_MUX
+    // (
+    // .Selector(pc_src_wire),
+    // .MUX_Data0(pc_plus_4_wire),
+    // .MUX_Data1(branch_adder_output_wire),
+    // .MUX_Output(next_pc_wire_1)
+    // );
     
-    Adder32bits
-    PC_Adder
-    (
-    .Data0(pc_wire),
-    .Data1(PC_INCREMENT),
-    .Result(pc_plus_4_wire)
-    );
+    // Adder32bits
+    // PC_Adder
+    // (
+    // .Data0(pc_wire),
+    // .Data1(4),
+    // .Result(pc_plus_4_wire)
+    // );
     
     ShiftLeft2
     Shift_Left_2_1
@@ -133,24 +144,24 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     .MUX_Output(next_pc_wire_2)
     );
     
-    PC_Register
-    ProgramCounter
-    (
-    .clk(clk),
-    .reset(reset),
-    .NewPC(next_pc_wire_2),
-    .PCValue(pc_wire)
-    );
+    // PC_Register
+    // ProgramCounter
+    // (
+    // .clk(clk),
+    // .reset(reset),
+    // .NewPC(next_pc_wire_2),
+    // .PCValue(pc_wire)
+    // );
     
-    ProgramMemory
-    #(
-    .MEMORY_DEPTH(MEMORY_DEPTH)
-    )
-    ROMProgramMemory
-    (
-    .Address(pc_wire),
-    .Instruction(instruction_bus_wire)
-    );
+    // ProgramMemory
+    // #(
+    // .MEMORY_DEPTH(MEMORY_DEPTH)
+    // )
+    // ROMProgramMemory
+    // (
+    // .Address(pc_wire),
+    // .Instruction(instruction_bus_wire)
+    // );
     
     Control
     ControlUnit
