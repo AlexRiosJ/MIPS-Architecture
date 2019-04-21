@@ -14,10 +14,10 @@
 module IF_Stage #(parameter MEMORY_DEPTH = 256)
                  (input clk,
                   input reset,
-                  input pc_src_in,
-                  input pc_branch_in,
+                  input pc_src_M,
+                  input pc_branch_M,
                   output reg [31:0] instruction_bus,
-                  output reg [31:0] pc_plus_4_out);
+                  output reg [31:0] pc_plus_4_IF);
     
     wire [31:0] pc_wire;
     wire [31:0] next_pc_wire;
@@ -54,13 +54,13 @@ module IF_Stage #(parameter MEMORY_DEPTH = 256)
     Multiplexer2to1
     PC_Src_MUX
     (
-    .Selector(pc_src_in),
+    .Selector(pc_src_M),
     .MUX_Data0(pc_plus_4_wire),
-    .MUX_Data1(pc_branch_in),
+    .MUX_Data1(pc_branch_M),
     .MUX_Output(next_pc_wire)
     );
     
     assign instruction_bus = instruction_bus_wire;
-    assign pc_plus_4_out    = pc_plus_4_wire;
+    assign pc_plus_4_IF    = pc_plus_4_wire;
     
 endmodule
