@@ -37,9 +37,8 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
                        (input clk,
                         input reset,
                         input [7:0] PortIn,
-                        output [31:0] ALUResultOut,
                         output [31:0] PortOut);
-    assign  PortOut = 0;
+    assign PortOut = 0;
     
     // Instruction Fetch stage Wires
     wire [31:0] next_pc_wire;
@@ -81,6 +80,8 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     wire [4:0] shamt_wire_EX;
     wire zero_wire_EX;
     wire [31:0] alu_result_wire_EX;
+	 wire [4:0] rt_wire_EX;
+	 wire [4:0] rd_wire_EX;
     wire [4:0] write_register_wire_EX;
     wire [31:0] pc_branch_wire_EX;
     wire [3:0] alu_operation_wire;
@@ -109,6 +110,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     wire [31:0] alu_result_wire_WB;
     wire [31:0] read_data_wire_WB;
     wire [4:0] write_register_wire_WB;
+	 wire [31:0] write_data_wire_WB;
 
     // signals to connect modules
     wire [1:0] jump_wire;
@@ -129,7 +131,6 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     wire [31:0] read_data_2_wire; //
     wire [31:0] immediate_extend_wire; //
     wire [31:0] read_data_2_or_immediate_wire; //
-    wire [31:0] alu_result_wire; //
     wire [31:0] branch_adder_output_wire;
     wire [31:0] pc_plus_4_wire; //
     wire [27:0] jump_address_wire;
@@ -457,8 +458,6 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     );
     
     // ************************************************************************** //
-    
-    assign ALUResultOut = alu_result_wire;
     
 endmodule
     
