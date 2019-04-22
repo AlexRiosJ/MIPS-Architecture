@@ -26,7 +26,6 @@ DUV
 (
     .clk(clk),
     .reset(reset),
-    .ALUResultOut(ALUResultOut),
     .PortOut(PortOut)
 );
 /*********************************************************/
