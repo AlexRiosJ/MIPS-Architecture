@@ -12,10 +12,11 @@
 	add $zero, $zero, $zero
 	add $zero, $zero, $zero
 	addi $t2, $t1, 3
+	addi $t3, $t3, 0x1001
 	add $zero, $zero, $zero
 	add $zero, $zero, $zero
 	add $zero, $zero, $zero
-	addi $t3, $t3, 0x010010000
+	sll $t3, $t3, 16
 	add $zero, $zero, $zero
 	add $zero, $zero, $zero
 	add $zero, $zero, $zero
