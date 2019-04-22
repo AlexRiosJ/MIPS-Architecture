@@ -57,7 +57,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     wire branch_eq_wire_ID;
     wire [3:0] aluop_wire_ID;
     wire alu_src_wire_ID;
-    wire reg_dst_wire_ID;
+    wire [1:0] reg_dst_wire_ID;
     wire [31:0] read_data_1_wire_ID;
     wire [31:0] read_data_2_wire_ID;
     wire [31:0] immediate_extend_wire_ID;
@@ -72,7 +72,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     wire branch_eq_wire_EX;
     wire [3:0] aluop_wire_EX;
     wire alu_src_wire_EX;
-    wire reg_dst_wire_EX;
+    wire [1:0] reg_dst_wire_EX;
     wire [31:0] read_data_1_wire_EX;
     wire [31:0] read_data_2_wire_EX;
     wire [31:0] immediate_extend_wire_EX;
@@ -421,7 +421,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     .mem_to_reg_out(mem_to_reg_wire_WB),
     .alu_result_out(alu_result_wire_WB),
     .read_data_out(read_data_wire_WB),
-    .write_reg_out(write_register_wire_WB),
+    .write_reg_out(write_register_wire_WB)
     );
     
     // ************************************************************************** //
