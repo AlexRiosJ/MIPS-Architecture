@@ -87,6 +87,8 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     wire [31:0] pc_branch_wire_EX;
     wire [3:0] alu_operation_wire;
     wire [31:0] shift_left_2_1_wire;
+    wire [1:0] forwardA_wire;
+    wire [1:0] forwardB_wire;
 
     // Memory stage wires
     wire reg_write_wire_ME;
@@ -111,7 +113,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     wire [31:0] alu_result_wire_WB;
     wire [31:0] read_data_wire_WB;
     wire [4:0] write_register_wire_WB;
-	 wire [31:0] write_data_wire_WB;
+	wire [31:0] write_data_wire_WB;
 
     // signals to connect modules
     wire [1:0] jump_wire;
@@ -440,6 +442,22 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     );
     
     // ************************************************************************** //
+    // ******************************** Forwarding Unit ************************ //
+    ForwardingUnit
+    ForwardingUnit
+    (
+    .EX_ME_reg_write(reg_write_wire_ME),
+    .ME_WB_reg_write(reg_write_wire_WB),
+    .ID_EX_rs(rs_wire_EX),
+    .ID_EX_rt(rt_wire_EX),
+    .EX_ME_write_register(write_register_wire_ME),
+    .ME_WB_write_register(write_register_wire_WB),
+
+    .ForwardA(forwardA_wire),
+    .ForwardB(forwardB_wire),
+    );
+
+    // ************************************************************************* //
 
     // ****** Seccion del j, jal y jr que no se usa ****** //
     ShiftLeft2
