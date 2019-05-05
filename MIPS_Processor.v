@@ -89,6 +89,8 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     wire [31:0] shift_left_2_1_wire;
     wire [1:0] forwardA_wire;
     wire [1:0] forwardB_wire;
+    wire [31:0] forwardA_mux_result_wire;
+    wire [31:0] forwardB_mux_result_wire;
 
     // Memory stage wires
     wire reg_write_wire_ME;
@@ -297,7 +299,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     ALU_Src_MUX
     (
     .Selector(alu_src_wire_EX),
-    .MUX_Data0(read_data_2_wire_EX),
+    .MUX_Data0(forwardB_mux_result_wire),
     .MUX_Data1(immediate_extend_wire_EX),
     .MUX_Output(src_B_wire_EX)
     );
@@ -314,7 +316,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     ArithmeticLogicUnit
     (
     .ALUOperation(alu_operation_wire),
-    .A(read_data_1_wire_EX),
+    .A(forwardA_mux_result_wire),
     .B(src_B_wire_EX),
     .Shamt(shamt_wire_EX),
     .Zero(zero_wire_EX),
@@ -336,6 +338,26 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     .Result(pc_branch_wire_EX)
     );
 
+    Multiplexer3to1
+    ForwardA_MUX
+    (
+    .Selector(forwardA_wire),
+    .MUX_Data0(read_data_1_wire_EX),
+    .MUX_Data1(write_data_wire_WB),
+    .MUX_Data2(alu_result_wire_ME),
+    .MUX_Output(forwardA_mux_result_wire)
+    );
+
+    Multiplexer3to1
+    ForwardB_MUX
+    (
+    .Selector(forwardB_wire),
+    .MUX_Data0(read_data_2_wire_EX),
+    .MUX_Data1(write_data_wire_WB),
+    .MUX_Data2(alu_result_wire_ME),
+    .MUX_Output(forwardB_mux_result_wire)
+    );
+
     // ************************************************************************** //
     // ******************************** EX ME Register ************************** //
     EX_ME_Register 
@@ -352,7 +374,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     .branch_eq_in(branch_eq_wire_EX),
     .zero_in(zero_wire_EX),
     .alu_result_in(alu_result_wire_EX),
-    .write_data_in(read_data_2_wire_EX),
+    .write_data_in(forwardB_mux_result_wire),
     .write_reg_in(write_register_wire_EX),
     .pc_branch_in(pc_branch_wire_EX),
 
