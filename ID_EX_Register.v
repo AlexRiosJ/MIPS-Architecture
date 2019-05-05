@@ -24,6 +24,7 @@ module ID_EX_Register (input clk,
                        input [1:0] reg_dst_in,
                        input [31:0] read_data_1_in,
                        input [31:0] read_data_2_in,
+                       input [4:0] rs_in,
                        input [4:0] rt_in,
                        input [4:0] rd_in,
                        input [4:0] shamt_in,
@@ -40,6 +41,7 @@ module ID_EX_Register (input clk,
                        output reg [1:0] reg_dst_out,
                        output reg [31:0] read_data_1_out,
                        output reg [31:0] read_data_2_out,
+                       output reg [4:0] rs_out,
                        output reg [4:0] rt_out,
                        output reg [4:0] rd_out,
                        output reg [4:0] shamt_out,
@@ -61,6 +63,7 @@ module ID_EX_Register (input clk,
             reg_dst_out          <= 0;
             read_data_1_out      <= 0;
             read_data_2_out      <= 0;
+            rs_out               <= 0;
             rt_out               <= 0;
             rd_out               <= 0;
             shamt_out            <= 0;
@@ -79,6 +82,7 @@ module ID_EX_Register (input clk,
             reg_dst_out          <= reg_dst_in;
             read_data_1_out      <= read_data_1_in;
             read_data_2_out      <= read_data_2_in;
+            rs_out               <= rs_in;
             rt_out               <= rt_in;
             rd_out               <= rd_in;
             shamt_out            <= shamt_in;
