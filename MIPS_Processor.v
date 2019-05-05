@@ -80,8 +80,9 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     wire [4:0] shamt_wire_EX;
     wire zero_wire_EX;
     wire [31:0] alu_result_wire_EX;
-	 wire [4:0] rt_wire_EX;
-	 wire [4:0] rd_wire_EX;
+    wire [4:0] rs_wire_EX;
+	wire [4:0] rt_wire_EX;
+	wire [4:0] rd_wire_EX;
     wire [4:0] write_register_wire_EX;
     wire [31:0] pc_branch_wire_EX;
     wire [3:0] alu_operation_wire;
@@ -248,6 +249,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     .reg_dst_in(reg_dst_wire_ID),
     .read_data_1_in(read_data_1_wire_ID),
     .read_data_2_in(read_data_2_wire_ID),
+    .rs_in(instruction_bus_wire_ID[25:21]),
     .rt_in(instruction_bus_wire_ID[20:16]),
     .rd_in(instruction_bus_wire_ID[15:11]),
     .shamt_in(instruction_bus_wire_ID[10:6]),
@@ -266,6 +268,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     .reg_dst_out(reg_dst_wire_EX),
     .read_data_1_out(read_data_1_wire_EX),
     .read_data_2_out(read_data_2_wire_EX),
+    .rs_out(rs_wire_EX),
     .rt_out(rt_wire_EX),
     .rd_out(rd_wire_EX),
     .shamt_out(shamt_wire_EX),
