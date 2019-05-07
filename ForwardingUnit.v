@@ -40,16 +40,16 @@ module ForwardingUnit (input EX_ME_reg_write,
 
         if(ME_WB_reg_write
         && (ME_WB_write_register != 0)
-        && !(EX_ME_reg_write && (EX_ME_write_register != 0)
-            && (EX_ME_write_register != ID_EX_rs))
+        //&& !(EX_ME_reg_write && (EX_ME_write_register != 0)
+            && (EX_ME_write_register != ID_EX_rs)
         && (ME_WB_write_register == ID_EX_rs))
         begin
             ForwardA = 2'b01;
         end
         if(ME_WB_reg_write
         && (ME_WB_write_register != 0)
-        && !(EX_ME_reg_write && (EX_ME_write_register != 0)
-            && (EX_ME_write_register != ID_EX_rt))
+        //&& !(EX_ME_reg_write && (EX_ME_write_register != 0)
+            && (EX_ME_write_register != ID_EX_rt)
         && (ME_WB_write_register == ID_EX_rt))
         begin
             ForwardB = 2'b01;
