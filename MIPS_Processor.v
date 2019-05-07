@@ -476,7 +476,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     .ME_WB_write_register(write_register_wire_WB),
 
     .ForwardA(forwardA_wire),
-    .ForwardB(forwardB_wire),
+    .ForwardB(forwardB_wire)
     );
 
     // ************************************************************************* //
