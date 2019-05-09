@@ -26,7 +26,7 @@ module ProgramMemory #(parameter MEMORY_DEPTH = 32,
     
     initial
     begin
-        $readmemh("./sources/text.dat", rom); // Cambiar
+        $readmemh("./sources/text_matrix.dat", rom); // Cambiar
     end
     
     always @ (RealAddress)

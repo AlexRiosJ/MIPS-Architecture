@@ -41,7 +41,8 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     assign PortOut = 0;
     
     // Instruction Fetch stage Wires
-    wire [31:0] next_pc_wire;
+    wire [31:0] next_pc_wire_1;
+    wire [31:0] next_pc_wire_2;
     wire [31:0] pc_wire;
     wire [31:0] pc_plus_4_wire_IF;
     wire [31:0] instruction_bus_wire_IF;
@@ -61,6 +62,13 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     wire [31:0] read_data_1_wire_ID;
     wire [31:0] read_data_2_wire_ID;
     wire [31:0] immediate_extend_wire_ID;
+    wire zero_wire;
+    wire pc_src_wire_ID;
+    wire forwardA_ID_wire;
+    wire forwardB_ID_wire;
+    wire [31:0] forwardA_ID_mux_out_wire;
+    wire [31:0] forwardB_ID_mux_out_wire;
+    wire [31:0] pc_branch_wire_ID;
 
     // Execute stage wires
     wire [31:0] pc_plus_4_wire_EX;
@@ -78,31 +86,29 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     wire [31:0] immediate_extend_wire_EX;
     wire [31:0] src_B_wire_EX;
     wire [4:0] shamt_wire_EX;
-    wire zero_wire_EX;
     wire [31:0] alu_result_wire_EX;
-	 wire [4:0] rt_wire_EX;
-	 wire [4:0] rd_wire_EX;
+    wire [4:0] rs_wire_EX;
+	wire [4:0] rt_wire_EX;
+	wire [4:0] rd_wire_EX;
     wire [4:0] write_register_wire_EX;
     wire [31:0] pc_branch_wire_EX;
     wire [3:0] alu_operation_wire;
     wire [31:0] shift_left_2_1_wire;
+    wire [1:0] forwardA_wire;
+    wire [1:0] forwardB_wire;
+    wire [31:0] forwardA_mux_result_wire;
+    wire [31:0] forwardB_mux_result_wire;
 
     // Memory stage wires
     wire reg_write_wire_ME;
     wire [1:0] mem_to_reg_wire_ME;
     wire mem_write_wire_ME;
     wire mem_read_wire_ME;
-    wire branch_ne_wire_ME;
-    wire branch_eq_wire_ME;
-    wire zero_wire_ME;
     wire [31:0] alu_result_wire_ME;
     wire [31:0] write_data_wire_ME;
     wire [4:0] write_register_wire_ME;
     wire [31:0] pc_branch_wire_ME;
     wire [31:0] read_data_wire_ME;
-    wire zero_and_branch_eq_wire;
-    wire not_zero_and_branch_ne_wire;
-    wire pc_src_wire_ME;
 
     // Write Back wires
     wire reg_write_wire_WB;
@@ -110,16 +116,18 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     wire [31:0] alu_result_wire_WB;
     wire [31:0] read_data_wire_WB;
     wire [4:0] write_register_wire_WB;
-	 wire [31:0] write_data_wire_WB;
+	wire [31:0] write_data_wire_WB;
+
+    // Hazard / Stall Flushes Wires
+    wire stall_IF_wire;
+    wire stall_ID_wire;
+    wire flush_EX_wire;
 
     // signals to connect modules
     wire [1:0] jump_wire;
-    wire branch_ne_wire; //
-    wire branch_eq_wire; //
     wire [1:0] reg_dst_wire; //
     wire alu_src_wire; //
     wire reg_write_wire; //
-    wire zero_wire; //
     wire mem_read_wire;
     wire mem_write_wire;
     wire [1:0] mem_to_reg_wire;
@@ -140,18 +148,29 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     Multiplexer2to1
     PC_Src_MUX
     (
-    .Selector(pc_src_wire_ME),
+    .Selector(pc_src_wire_ID),
     .MUX_Data0(pc_plus_4_wire_IF),
-    .MUX_Data1(pc_branch_wire_ME),
-    .MUX_Output(next_pc_wire)
+    .MUX_Data1(pc_branch_wire_ID),
+    .MUX_Output(next_pc_wire_1)
     );
+
+    // Multiplexer3to1
+    // PC_Src_MUX_2
+    // (
+    // .Selector(jump_wire),
+    // .MUX_Data0(next_pc_wire_1),
+    // .MUX_Data1({pc_plus_4_wire_ID[31:28], jump_address_wire & 28'h000_03ff}), // 10 bit mask for ROM
+    // .MUX_Data2(read_data_1_wire_ID),
+    // .MUX_Output(next_pc_wire_2)
+    // );
     
     PC_Register
     ProgramCounter
     (
     .clk(clk),
     .reset(reset),
-    .NewPC(next_pc_wire),
+    .enable(~stall_IF_wire),
+    .NewPC(next_pc_wire_1),
     .PCValue(pc_wire)
     );
     
@@ -180,7 +199,8 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     (
     // Inputs
     .clk(clk),
-    .reset(reset),
+    .reset(reset && ~pc_src_wire_ID),
+    .enable(~stall_ID_wire),
     .instruction_in(instruction_bus_wire_IF),
     .pc_plus_4_in(pc_plus_4_wire_IF),
 
@@ -208,6 +228,13 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     .RegWrite(reg_write_wire_ID)
     );
 
+    // ShiftLeft2
+    // Shift_Left_2_2
+    // (
+    // .DataInput(instruction_bus_wire_ID[25:0]),
+    // .DataOutput(jump_address_wire)
+    // );
+
     RegisterFile
     Register_File
     (
@@ -222,11 +249,61 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     .ReadData2(read_data_2_wire_ID)
     );
 
+    Multiplexer2to1
+    ForwardA_ID_MUX
+    (
+    .Selector(forwardA_ID_wire),
+    .MUX_Data0(read_data_1_wire_ID),
+    .MUX_Data1(alu_result_wire_ME),
+    .MUX_Output(forwardA_ID_mux_out_wire)
+    );
+
+    Multiplexer2to1
+    ForwardB_ID_MUX
+    (
+    .Selector(forwardB_ID_wire),
+    .MUX_Data0(read_data_2_wire_ID),
+    .MUX_Data1(alu_result_wire_ME),
+    .MUX_Output(forwardB_ID_mux_out_wire)
+    );
+
+    EqualityComparator
+    EqualityComparator
+    (
+    .ReadData1(forwardA_ID_mux_out_wire),
+    .ReadData2(forwardB_ID_mux_out_wire),
+    .Zero(zero_wire)
+    );
+
+    Multiplexer2to1
+    BranchEQ_NE_MUX
+    (
+    .Selector(zero_wire),
+    .MUX_Data0(branch_ne_wire_ID),
+    .MUX_Data1(branch_eq_wire_ID),
+    .MUX_Output(pc_src_wire_ID)
+    );
+
     SignExtend
     SignExtendForConstants
     (
     .DataInput(instruction_bus_wire_ID[15:0]),
     .SignExtendOutput(immediate_extend_wire_ID)
+    );
+
+    ShiftLeft2
+    Shift_Left_2_1
+    (
+    .DataInput(immediate_extend_wire_ID),
+    .DataOutput(shift_left_2_1_wire)
+    );
+
+    Adder32bits
+    Branch_Adder
+    (
+    .Data0(pc_plus_4_wire_ID),
+    .Data1(shift_left_2_1_wire),
+    .Result(pc_branch_wire_ID)
     );
 
     // ************************************************************************** //
@@ -236,18 +313,17 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     (
     // Inputs
     .clk(clk),
-    .reset(reset),
+    .reset(reset && ~flush_EX_wire),
     .reg_write_in(reg_write_wire_ID),
     .mem_to_reg_in(mem_to_reg_wire_ID),
     .mem_write_in(mem_write_wire_ID),
     .mem_read_in(mem_read_wire_ID),
-    .branch_ne_in(branch_ne_wire_ID),
-    .branch_eq_in(branch_eq_wire_ID),
     .aluop_in(aluop_wire_ID),
     .alu_src_in(alu_src_wire_ID),
     .reg_dst_in(reg_dst_wire_ID),
     .read_data_1_in(read_data_1_wire_ID),
     .read_data_2_in(read_data_2_wire_ID),
+    .rs_in(instruction_bus_wire_ID[25:21]),
     .rt_in(instruction_bus_wire_ID[20:16]),
     .rd_in(instruction_bus_wire_ID[15:11]),
     .shamt_in(instruction_bus_wire_ID[10:6]),
@@ -259,13 +335,12 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     .mem_to_reg_out(mem_to_reg_wire_EX),
     .mem_write_out(mem_write_wire_EX),
     .mem_read_out(mem_read_wire_EX),
-    .branch_ne_out(branch_ne_wire_EX),
-    .branch_eq_out(branch_eq_wire_EX),
     .aluop_out(aluop_wire_EX),
     .alu_src_out(alu_src_wire_EX),
     .reg_dst_out(reg_dst_wire_EX),
     .read_data_1_out(read_data_1_wire_EX),
     .read_data_2_out(read_data_2_wire_EX),
+    .rs_out(rs_wire_EX),
     .rt_out(rt_wire_EX),
     .rd_out(rd_wire_EX),
     .shamt_out(shamt_wire_EX),
@@ -292,7 +367,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     ALU_Src_MUX
     (
     .Selector(alu_src_wire_EX),
-    .MUX_Data0(read_data_2_wire_EX),
+    .MUX_Data0(forwardB_mux_result_wire),
     .MUX_Data1(immediate_extend_wire_EX),
     .MUX_Output(src_B_wire_EX)
     );
@@ -309,26 +384,30 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     ArithmeticLogicUnit
     (
     .ALUOperation(alu_operation_wire),
-    .A(read_data_1_wire_EX),
+    .A(forwardA_mux_result_wire),
     .B(src_B_wire_EX),
     .Shamt(shamt_wire_EX),
-    .Zero(zero_wire_EX),
     .ALUResult(alu_result_wire_EX)
     );
 
-    ShiftLeft2
-    Shift_Left_2_1
+    Multiplexer3to1
+    ForwardA_MUX
     (
-    .DataInput(immediate_extend_wire_EX),
-    .DataOutput(shift_left_2_1_wire)
+    .Selector(forwardA_wire),
+    .MUX_Data0(read_data_1_wire_EX),
+    .MUX_Data1(write_data_wire_WB),
+    .MUX_Data2(alu_result_wire_ME),
+    .MUX_Output(forwardA_mux_result_wire)
     );
 
-    Adder32bits
-    Branch_Adder
+    Multiplexer3to1
+    ForwardB_MUX
     (
-    .Data0(pc_plus_4_wire_EX),
-    .Data1(shift_left_2_1_wire),
-    .Result(pc_branch_wire_EX)
+    .Selector(forwardB_wire),
+    .MUX_Data0(read_data_2_wire_EX),
+    .MUX_Data1(write_data_wire_WB),
+    .MUX_Data2(alu_result_wire_ME),
+    .MUX_Output(forwardB_mux_result_wire)
     );
 
     // ************************************************************************** //
@@ -343,22 +422,16 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     .mem_to_reg_in(mem_to_reg_wire_EX),
     .mem_write_in(mem_write_wire_EX),
     .mem_read_in(mem_read_wire_EX),
-    .branch_ne_in(branch_ne_wire_EX),
-    .branch_eq_in(branch_eq_wire_EX),
-    .zero_in(zero_wire_EX),
     .alu_result_in(alu_result_wire_EX),
-    .write_data_in(read_data_2_wire_EX),
+    .write_data_in(forwardB_mux_result_wire),
     .write_reg_in(write_register_wire_EX),
-    .pc_branch_in(pc_branch_wire_EX),
+    .pc_branch_in(pc_plus_4_wire_EX),
 
      // Outputs
     .reg_write_out(reg_write_wire_ME),
     .mem_to_reg_out(mem_to_reg_wire_ME),
     .mem_write_out(mem_write_wire_ME),
     .mem_read_out(mem_read_wire_ME),
-    .branch_ne_out(branch_ne_wire_ME),
-    .branch_eq_out(branch_eq_wire_ME),
-    .zero_out(zero_wire_ME),
     .alu_result_out(alu_result_wire_ME),
     .write_data_out(write_data_wire_ME),
     .write_reg_out(write_register_wire_ME),
@@ -367,30 +440,6 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     
     // ************************************************************************** //
     // ******************************** ME Stage ******************************** //
-    ANDGate
-    BranchEQ_AND_Gate
-    (
-    .A(branch_eq_wire_ME),
-    .B(zero_wire_ME),
-    .C(zero_and_branch_eq_wire)
-    );
-    
-    ANDGate
-    BranchNE_AND_Gate
-    (
-    .A(branch_ne_wire_ME),
-    .B(~zero_wire_ME),
-    .C(not_zero_and_branch_ne_wire)
-    );
-    
-    ORGate
-    Branch_OR_Gate
-    (
-    .A(zero_and_branch_eq_wire),
-    .B(not_zero_and_branch_ne_wire),
-    .C(pc_src_wire_ME)
-    );
-
     DataMemory
     Data_Memory_RAM
     (
@@ -437,25 +486,46 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     );
     
     // ************************************************************************** //
+    // ******************************** Forwarding Unit ************************ //
+    ForwardingUnit
+    ForwardingUnit
+    (
+    .EX_ME_reg_write(reg_write_wire_ME),
+    .ME_WB_reg_write(reg_write_wire_WB),
+    .ID_EX_rs(rs_wire_EX),
+    .ID_EX_rt(rt_wire_EX),
+    .EX_ME_write_register(write_register_wire_ME),
+    .ME_WB_write_register(write_register_wire_WB),
+
+    .ForwardA(forwardA_wire),
+    .ForwardB(forwardB_wire)
+    );
+
+    // ************************************************************************* //
+    // ******************************** Hazard Detection Unit ****************** //
+    HazardDetectionUnit
+    HazardDetectionUnit
+    (
+    .Rs_ID(instruction_bus_wire_ID[25:21]),
+    .Rt_ID(instruction_bus_wire_ID[20:16]),
+    .Rt_EX(rt_wire_EX),
+    .MemToReg_EX(mem_to_reg_wire_EX),
+    .MemToReg_ME(mem_to_reg_wire_ME),
+    .BranchEQ_ID(branch_eq_wire_ID),
+    .BranchNE_ID(branch_ne_wire_ID),
+    .RegWrite_EX(reg_write_wire_EX),
+    .RegWrite_ME(reg_write_wire_ME),
+    .WriteReg_EX(write_register_wire_EX),
+    .WriteReg_ME(write_register_wire_ME),
+
+    .Stall_IF(stall_IF_wire),
+    .Stall_ID(stall_ID_wire),
+    .Flush_EX(flush_EX_wire),
+    .ForwardA_ID(forwardA_ID_wire),
+    .ForwardB_ID(forwardB_ID_wire)
+    );
 
     // ****** Seccion del j, jal y jr que no se usa ****** //
-    ShiftLeft2
-    Shift_Left_2_2
-    (
-    .DataInput(instruction_bus_wire_ID[25:0]), // Cambiar despues porque es necesario que viaje por más pipelines
-    .DataOutput(jump_address_wire) // Probablemente tenga que viajar por mas los pipelines
-    );
-
-    // MUX dudoso que sugiero que se coloque antes del pc en IF
-    Multiplexer3to1
-    PC_Src_MUX_2
-    (
-    .Selector(jump_wire),
-    .MUX_Data0(next_pc_wire_1),
-    .MUX_Data1({pc_plus_4_wire[31:28], jump_address_wire & 28'h000_03ff}), // 10 bit mask for ROM
-    .MUX_Data2(read_data_1_wire),
-    .MUX_Output(next_pc_wire_2)
-    );
     
     // ************************************************************************** //
     
