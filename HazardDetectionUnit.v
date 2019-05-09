@@ -21,6 +21,7 @@ module HazardDetectionUnit (input [4:0] Rs_ID,
 
     always@(*)
     begin
+        {Stall_ID, Stall_IF, Flush_EX} <= 0;
         if(MemToReg_EX == 2'b01 && ((Rs_ID == Rt_EX) || (Rt_ID == Rt_EX))) begin
             {Stall_ID, Stall_IF, Flush_EX} <= 1;
         end
