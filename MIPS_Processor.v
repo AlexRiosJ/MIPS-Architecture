@@ -61,6 +61,8 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     wire [31:0] read_data_1_wire_ID;
     wire [31:0] read_data_2_wire_ID;
     wire [31:0] immediate_extend_wire_ID;
+    wire zero_wire;
+    wire pc_src_wire_ID;
 
     // Execute stage wires
     wire [31:0] pc_plus_4_wire_EX;
@@ -78,7 +80,6 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     wire [31:0] immediate_extend_wire_EX;
     wire [31:0] src_B_wire_EX;
     wire [4:0] shamt_wire_EX;
-    wire zero_wire_EX;
     wire [31:0] alu_result_wire_EX;
     wire [4:0] rs_wire_EX;
 	wire [4:0] rt_wire_EX;
@@ -97,17 +98,11 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     wire [1:0] mem_to_reg_wire_ME;
     wire mem_write_wire_ME;
     wire mem_read_wire_ME;
-    wire branch_ne_wire_ME;
-    wire branch_eq_wire_ME;
-    wire zero_wire_ME;
     wire [31:0] alu_result_wire_ME;
     wire [31:0] write_data_wire_ME;
     wire [4:0] write_register_wire_ME;
     wire [31:0] pc_branch_wire_ME;
     wire [31:0] read_data_wire_ME;
-    wire zero_and_branch_eq_wire;
-    wire not_zero_and_branch_ne_wire;
-    wire pc_src_wire_ME;
 
     // Write Back wires
     wire reg_write_wire_WB;
@@ -124,12 +119,9 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
 
     // signals to connect modules
     wire [1:0] jump_wire;
-    wire branch_ne_wire; //
-    wire branch_eq_wire; //
     wire [1:0] reg_dst_wire; //
     wire alu_src_wire; //
     wire reg_write_wire; //
-    wire zero_wire; //
     wire mem_read_wire;
     wire mem_write_wire;
     wire [1:0] mem_to_reg_wire;
@@ -150,7 +142,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     Multiplexer2to1
     PC_Src_MUX
     (
-    .Selector(pc_src_wire_ME),
+    .Selector(pc_src_wire_ID),
     .MUX_Data0(pc_plus_4_wire_IF),
     .MUX_Data1(pc_branch_wire_ME),
     .MUX_Output(next_pc_wire)
@@ -191,7 +183,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     (
     // Inputs
     .clk(clk),
-    .reset(reset),
+    .reset(reset && ~pc_src_wire_ID),
     .enable(~stall_ID_wire),
     .instruction_in(instruction_bus_wire_IF),
     .pc_plus_4_in(pc_plus_4_wire_IF),
@@ -232,6 +224,23 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     .WriteData(write_data_wire_WB),
     .ReadData1(read_data_1_wire_ID),
     .ReadData2(read_data_2_wire_ID)
+    );
+
+    EqualityComparator
+    EqualityComparator
+    (
+    .ReadData1(read_data_1_wire_ID),
+    .ReadData2(read_data_2_wire_ID),
+    .Zero(zero_wire)
+    );
+
+    Multiplexer2to1
+    BranchEQ_NE_MUX
+    (
+    .Selector(zero_wire),
+    .MUX_Data0(branch_ne_wire_ID),
+    .MUX_Data1(branch_eq_wire_ID),
+    .MUX_Output(pc_src_wire_ID)
     );
 
     SignExtend
@@ -326,7 +335,6 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     .A(forwardA_mux_result_wire),
     .B(src_B_wire_EX),
     .Shamt(shamt_wire_EX),
-    .Zero(zero_wire_EX),
     .ALUResult(alu_result_wire_EX)
     );
 
@@ -377,9 +385,6 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     .mem_to_reg_in(mem_to_reg_wire_EX),
     .mem_write_in(mem_write_wire_EX),
     .mem_read_in(mem_read_wire_EX),
-    .branch_ne_in(branch_ne_wire_EX),
-    .branch_eq_in(branch_eq_wire_EX),
-    .zero_in(zero_wire_EX),
     .alu_result_in(alu_result_wire_EX),
     .write_data_in(forwardB_mux_result_wire),
     .write_reg_in(write_register_wire_EX),
@@ -390,9 +395,6 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     .mem_to_reg_out(mem_to_reg_wire_ME),
     .mem_write_out(mem_write_wire_ME),
     .mem_read_out(mem_read_wire_ME),
-    .branch_ne_out(branch_ne_wire_ME),
-    .branch_eq_out(branch_eq_wire_ME),
-    .zero_out(zero_wire_ME),
     .alu_result_out(alu_result_wire_ME),
     .write_data_out(write_data_wire_ME),
     .write_reg_out(write_register_wire_ME),
@@ -401,30 +403,6 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     
     // ************************************************************************** //
     // ******************************** ME Stage ******************************** //
-    ANDGate
-    BranchEQ_AND_Gate
-    (
-    .A(branch_eq_wire_ME),
-    .B(zero_wire_ME),
-    .C(zero_and_branch_eq_wire)
-    );
-    
-    ANDGate
-    BranchNE_AND_Gate
-    (
-    .A(branch_ne_wire_ME),
-    .B(~zero_wire_ME),
-    .C(not_zero_and_branch_ne_wire)
-    );
-    
-    ORGate
-    Branch_OR_Gate
-    (
-    .A(zero_and_branch_eq_wire),
-    .B(not_zero_and_branch_ne_wire),
-    .C(pc_src_wire_ME)
-    );
-
     DataMemory
     Data_Memory_RAM
     (

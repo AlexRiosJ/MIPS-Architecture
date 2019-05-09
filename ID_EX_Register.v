@@ -17,8 +17,6 @@ module ID_EX_Register (input clk,
                        input [1:0] mem_to_reg_in,
                        input mem_write_in,
                        input mem_read_in,
-                       input branch_ne_in,
-                       input branch_eq_in,
                        input [3:0] aluop_in,
                        input alu_src_in,
                        input [1:0] reg_dst_in,
@@ -34,8 +32,6 @@ module ID_EX_Register (input clk,
                        output reg [1:0] mem_to_reg_out,
                        output reg mem_write_out,
                        output reg mem_read_out,
-                       output reg branch_ne_out,
-                       output reg branch_eq_out,
                        output reg [3:0] aluop_out,
                        output reg alu_src_out,
                        output reg [1:0] reg_dst_out,
@@ -56,8 +52,6 @@ module ID_EX_Register (input clk,
             mem_to_reg_out       <= 0;
             mem_write_out        <= 0;
             mem_read_out         <= 0;
-            branch_ne_out        <= 0;
-            branch_eq_out        <= 0;
             aluop_out            <= 0;
             alu_src_out          <= 0;
             reg_dst_out          <= 0;
@@ -75,8 +69,6 @@ module ID_EX_Register (input clk,
             mem_to_reg_out       <= mem_to_reg_in;
             mem_write_out        <= mem_write_in;
             mem_read_out         <= mem_read_in;
-            branch_ne_out        <= branch_ne_in;
-            branch_eq_out        <= branch_eq_in;
             aluop_out            <= aluop_in;
             alu_src_out          <= alu_src_in;
             reg_dst_out          <= reg_dst_in;

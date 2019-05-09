@@ -17,9 +17,6 @@ module EX_ME_Register (input clk,
                        input [1:0] mem_to_reg_in,
                        input mem_write_in,
                        input mem_read_in,
-                       input branch_ne_in,
-                       input branch_eq_in,
-                       input zero_in,
                        input [31:0] alu_result_in,
                        input [31:0] write_data_in,
                        input [4:0] write_reg_in,
@@ -28,9 +25,6 @@ module EX_ME_Register (input clk,
                        output reg [1:0] mem_to_reg_out,
                        output reg mem_write_out,
                        output reg mem_read_out,
-                       output reg branch_ne_out,
-                       output reg branch_eq_out,
-                       output reg zero_out,
                        output reg [31:0] alu_result_out,
                        output reg [31:0] write_data_out,
                        output reg [4:0] write_reg_out,
@@ -42,9 +36,6 @@ module EX_ME_Register (input clk,
             mem_to_reg_out <= 0;
             mem_write_out  <= 0;
             mem_read_out   <= 0;
-            branch_ne_out  <= 0;
-            branch_eq_out  <= 0;
-            zero_out       <= 0;
             alu_result_out <= 0;
             write_data_out <= 0;
             write_reg_out  <= 0;
@@ -55,9 +46,6 @@ module EX_ME_Register (input clk,
             mem_to_reg_out <= mem_to_reg_in;
             mem_write_out  <= mem_write_in;
             mem_read_out   <= mem_read_in;
-            branch_ne_out  <= branch_ne_in;
-            branch_eq_out  <= branch_eq_in;
-            zero_out       <= zero_in;
             alu_result_out <= alu_result_in;
             write_data_out <= write_data_in;
             write_reg_out  <= write_reg_in;

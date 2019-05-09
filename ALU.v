@@ -26,7 +26,6 @@ module ALU (input [3:0] ALUOperation,
             input [31:0] A,
             input [31:0] B,
             input [4:0] Shamt,
-            output reg Zero,
             output reg [31:0] ALUResult);
 
 localparam AND = 4'b0000;
@@ -52,7 +51,6 @@ begin
         default:
         ALUResult = 0;
     endcase // case(control)
-    Zero = (ALUResult == 0) ? 1'b1 : 1'b0;
 end // always @ (A or B or control)
 
 endmodule // ALU
