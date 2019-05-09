@@ -117,6 +117,11 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     wire [4:0] write_register_wire_WB;
 	wire [31:0] write_data_wire_WB;
 
+    // Hazard / Stall Flushes Wires
+    wire stall_IF_wire;
+    wire stall_ID_wire;
+    wire flush_EX_wire;
+
     // signals to connect modules
     wire [1:0] jump_wire;
     wire branch_ne_wire; //
@@ -156,6 +161,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     (
     .clk(clk),
     .reset(reset),
+    .enable(~stall_IF_wire),
     .NewPC(next_pc_wire),
     .PCValue(pc_wire)
     );
@@ -186,6 +192,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     // Inputs
     .clk(clk),
     .reset(reset),
+    .enable(stall_ID_wire),
     .instruction_in(instruction_bus_wire_IF),
     .pc_plus_4_in(pc_plus_4_wire_IF),
 
@@ -241,7 +248,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     (
     // Inputs
     .clk(clk),
-    .reset(reset),
+    .reset(reset && ~flush_EX_wire),
     .reg_write_in(reg_write_wire_ID),
     .mem_to_reg_in(mem_to_reg_wire_ID),
     .mem_write_in(mem_write_wire_ID),
@@ -480,6 +487,19 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     );
 
     // ************************************************************************* //
+    // ******************************** Hazard Detection Unit ****************** //
+    HazardDetectionUnit
+    HazardDetectionUnit
+    (
+    .Rs_ID(instruction_bus_wire_ID[25:21]),
+    .Rt_ID(instruction_bus_wire_ID[20:16]),
+    .Rt_EX(rt_wire_EX),
+    .MemToReg_EX(mem_to_reg_wire_EX),
+
+    .Stall_IF(stall_IF_wire),
+    .Stall_ID(stall_ID_wire),
+    .Flush_EX(flush_EX_wire)
+    );
 
     // ****** Seccion del j, jal y jr que no se usa ****** //
     ShiftLeft2

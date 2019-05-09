@@ -50,7 +50,7 @@ module ID_EX_Register (input clk,
     
     
     
-    always@(negedge reset or posedge clk) begin
+    always@(posedge clk) begin
         if (reset == 0) begin
             reg_write_out        <= 0;
             mem_to_reg_out       <= 0;
