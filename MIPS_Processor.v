@@ -192,7 +192,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     // Inputs
     .clk(clk),
     .reset(reset),
-    .enable(stall_ID_wire),
+    .enable(~stall_ID_wire),
     .instruction_in(instruction_bus_wire_IF),
     .pc_plus_4_in(pc_plus_4_wire_IF),
 
