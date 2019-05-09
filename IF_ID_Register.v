@@ -19,7 +19,7 @@ module IF_ID_Register (input clk,
                        output reg [31:0] instruction_out,
                        output reg [31:0] pc_plus_4_out);
     
-    always@(negedge reset or posedge clk) begin
+    always@(posedge clk) begin
         if (reset == 0) begin
             pc_plus_4_out   <= 0;
             instruction_out <= 0;
