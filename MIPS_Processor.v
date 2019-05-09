@@ -63,6 +63,10 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     wire [31:0] immediate_extend_wire_ID;
     wire zero_wire;
     wire pc_src_wire_ID;
+    wire forwardA_ID_wire;
+    wire forwardB_ID_wire;
+    wire [31:0] forwardA_ID_mux_out_wire;
+    wire [31:0] forwardB_ID_mux_out_wire;
 
     // Execute stage wires
     wire [31:0] pc_plus_4_wire_EX;
@@ -226,11 +230,29 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     .ReadData2(read_data_2_wire_ID)
     );
 
+    Multiplexer2to1
+    ForwardA_ID_MUX
+    (
+    .Selector(forwardA_ID_wire),
+    .MUX_Data0(read_data_1_wire_ID),
+    .MUX_Data1(alu_result_wire_ME),
+    .MUX_Output(forwardA_ID_mux_out_wire)
+    );
+
+    Multiplexer2to1
+    ForwardB_ID_MUX
+    (
+    .Selector(forwardB_ID_wire),
+    .MUX_Data0(read_data_2_wire_ID),
+    .MUX_Data1(alu_result_wire_ME),
+    .MUX_Output(forwardB_ID_mux_out_wire)
+    );
+
     EqualityComparator
     EqualityComparator
     (
-    .ReadData1(read_data_1_wire_ID),
-    .ReadData2(read_data_2_wire_ID),
+    .ReadData1(forwardA_ID_mux_out_wire),
+    .ReadData2(forwardB_ID_mux_out_wire),
     .Zero(zero_wire)
     );
 
@@ -473,10 +495,19 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     .Rt_ID(instruction_bus_wire_ID[20:16]),
     .Rt_EX(rt_wire_EX),
     .MemToReg_EX(mem_to_reg_wire_EX),
+    .MemToReg_ME(mem_to_reg_wire_ME),
+    .BranchEQ_ID(branch_eq_wire_ID),
+    .BranchNE_ID(branch_ne_wire_ID),
+    .RegWrite_EX(reg_write_wire_EX),
+    .RegWrite_ME(reg_write_wire_ME),
+    .WriteReg_EX(write_register_wire_EX),
+    .WriteReg_ME(write_register_wire_ME),
 
     .Stall_IF(stall_IF_wire),
     .Stall_ID(stall_ID_wire),
-    .Flush_EX(flush_EX_wire)
+    .Flush_EX(flush_EX_wire),
+    .ForwardA_ID(forwardA_ID_wire),
+    .ForwardB_ID(forwardB_ID_wire)
     );
 
     // ****** Seccion del j, jal y jr que no se usa ****** //
