@@ -144,7 +144,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     (
     .Selector(pc_src_wire_ID),
     .MUX_Data0(pc_plus_4_wire_IF),
-    .MUX_Data1(pc_branch_wire_ME),
+    .MUX_Data1(pc_branch_wire_ID),
     .MUX_Output(next_pc_wire)
     );
     
@@ -250,6 +250,21 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     .SignExtendOutput(immediate_extend_wire_ID)
     );
 
+    ShiftLeft2
+    Shift_Left_2_1
+    (
+    .DataInput(immediate_extend_wire_ID),
+    .DataOutput(shift_left_2_1_wire)
+    );
+
+    Adder32bits
+    Branch_Adder
+    (
+    .Data0(pc_plus_4_wire_ID),
+    .Data1(shift_left_2_1_wire),
+    .Result(pc_branch_wire_ID)
+    );
+
     // ************************************************************************** //
     // ******************************** ID EX Register ************************** //
     ID_EX_Register 
@@ -338,21 +353,6 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     .ALUResult(alu_result_wire_EX)
     );
 
-    ShiftLeft2
-    Shift_Left_2_1
-    (
-    .DataInput(immediate_extend_wire_EX),
-    .DataOutput(shift_left_2_1_wire)
-    );
-
-    Adder32bits
-    Branch_Adder
-    (
-    .Data0(pc_plus_4_wire_EX),
-    .Data1(shift_left_2_1_wire),
-    .Result(pc_branch_wire_EX)
-    );
-
     Multiplexer3to1
     ForwardA_MUX
     (
@@ -388,7 +388,7 @@ module MIPS_Processor #(parameter MEMORY_DEPTH = 256,
     .alu_result_in(alu_result_wire_EX),
     .write_data_in(forwardB_mux_result_wire),
     .write_reg_in(write_register_wire_EX),
-    .pc_branch_in(pc_branch_wire_EX),
+    .pc_branch_in(pc_plus_4_wire_EX),
 
      // Outputs
     .reg_write_out(reg_write_wire_ME),
