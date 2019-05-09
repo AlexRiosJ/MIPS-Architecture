@@ -28,19 +28,31 @@ module HazardDetectionUnit (input [4:0] Rs_ID,
                             output reg ForwardA_ID,
                             output reg ForwardB_ID);
 
-    wire lwstall;
-    wire branchstall;
+    reg lwstall;
+    reg branchstall;
     
     always@(*)
     begin
         lwstall <= (MemToReg_EX == 2'b01 && ((Rs_ID == Rt_EX) || (Rt_ID == Rt_EX)));
         branchstall <= (((BranchNE_ID || BranchEQ_ID) && RegWrite_EX && (WriteReg_EX == Rs_ID || WriteReg_EX == Rt_ID)) || 
-                        ((BranchNE_ID || BranchEQ_ID) && MemToReg_ME && (WriteReg_ME == Rs_ID || WriteReg_ME == Rt_ID)))
+                        ((BranchNE_ID || BranchEQ_ID) && MemToReg_ME && (WriteReg_ME == Rs_ID || WriteReg_ME == Rt_ID)));
 
-        Stall_IF <= Stall_ID <= Flush_EX <= (lwstall || branchstall);
+        Stall_IF <= 0;
+        Stall_ID <= 0;
+        Flush_EX <= 0;
+        ForwardA_ID <= 0;
+        ForwardB_ID <= 0;
 
-        ForwardA_ID <= (Rs_ID != 0) && (Rs_ID == WriteReg_ME) && RegWrite_ME;
-        ForwardB_ID <= (Rt_ID != 0) && (Rt_ID == WriteReg_ME) && RegWrite_ME;
+        if (lwstall || branchstall) begin
+            Stall_IF <= 1;
+            Stall_ID <= 1;
+            Flush_EX <= 1;
+        end
+
+        if ((Rs_ID != 0) && (Rs_ID == WriteReg_ME) && RegWrite_ME)
+            ForwardA_ID <= 1;
+        if ((Rt_ID != 0) && (Rt_ID == WriteReg_ME) && RegWrite_ME)
+            ForwardB_ID <= 1;
     end
     
 endmodule
